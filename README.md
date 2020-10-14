@@ -1,11 +1,11 @@
 # postgres_dynamic_credentials
 
-## Docker:
+### Docker:
 
-# pull db image
+#### pull db image
 docker pull postgres:latest
 
-# start db
+#### start db
 docker run \
       --name postgres \
       --env POSTGRES_USER=root \
@@ -14,30 +14,30 @@ docker run \
       --publish 5432:5432 \
       postgres
 
-# connect to db
+#### connect to db
 docker exec -it postgres psql
 
-# create role in db
+#### create role in db
 CREATE ROLE ro NOINHERIT;
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO "ro";
-# disconnect
+#### disconnect
 \q
 
-## Vault
+### Vault
 
-# Policy for db admin:
+#### Policy for db admin:
 
-# Mount secrets engines
+#### Mount secrets engines
 path "sys/mounts/*" {
   capabilities = [ "create", "read", "update", "delete", "list" ]
 }
 
-# Configure the database secrets engine and create roles
+#### Configure the database secrets engine and create roles
 path "database/*" {
   capabilities = [ "create", "read", "update", "delete", "list" ]
 }
 
-# Manage the leases
+#### Manage the leases
 path "sys/leases/+/database/creds/readonly/*" {
   capabilities = [ "create", "read", "update", "delete", "list", "sudo" ]
 }
@@ -46,19 +46,19 @@ path "sys/leases/+/database/creds/readonly" {
   capabilities = [ "create", "read", "update", "delete", "list", "sudo" ]
 }
 
-# Policy for the apps that will be retrieving the secrets:
+#### Policy for the apps that will be retrieving the secrets:
 
-# Get credentials from the database secrets engine 'readonly' role.
+#### Get credentials from the database secrets engine 'readonly' role.
 path "database/creds/readonly" {
   capabilities = [ "read" ]
 }
 
-# Write policies in Vault:
+#### Write policies in Vault:
 
 vault write policy admin_policy /etc/vault.d/admin_policy.hcl
 vault write policy apps_policy /etc/vault.d/apps_policy.hcl
 
-# Create admin and apps user and map policies to them:
+#### Create admin and apps user and map policies to them:
 
 vault write auth/userpass/users/admin \
     password=admin-password \
@@ -68,7 +68,7 @@ vault write auth/userpass/users/apps \
     password=apps-password \
     policies=apps_policy
     
-# Login with admin user and enable DB secrets engine:
+#### Login with admin user and enable DB secrets engine:
 
 vault login -method=userpass \
   username=admin \
@@ -76,7 +76,7 @@ vault login -method=userpass \
   
 vault secrets enable database
 
-# Enable Postgres DB plugin:
+#### Enable Postgres DB plugin:
 
 vault write database/config/postgresql \
     plugin_name=postgresql-database-plugin \
@@ -85,7 +85,7 @@ vault write database/config/postgresql \
     username="root" \
     password="rootpassword"
     
-# Create DB role:
+#### Create DB role:
 
 vault write database/roles/readonly \
 > db_name=postgresql \
@@ -94,7 +94,7 @@ vault write database/roles/readonly \
 > default_ttl=1h \
 > max_ttl=24h
 
-# Read dynamic secret in Vault as app, and check it exists in the DB:
+#### Read dynamic secret in Vault as app, and check it exists in the DB:
 
 vault login -method=userpass username=apps password=apps-password
 
