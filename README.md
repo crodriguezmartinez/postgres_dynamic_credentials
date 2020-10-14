@@ -112,6 +112,8 @@ username           v-userpass-readonly-hzwKvpA3tUqy69pzvz9R-1602662337
 
 docker exec -it postgres psql
 
+SELECT usename, valuntil FROM pg_user;
+
 ```
                        usename                       |        valuntil        
 -----------------------------------------------------+------------------------
