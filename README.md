@@ -88,11 +88,11 @@ vault write database/config/postgresql \
 #### Create DB role:
 
 vault write database/roles/readonly \
-> db_name=postgresql \
-> creation_statements="CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}'; \
->         GRANT SELECT ON ALL TABLES IN SCHEMA public TO \"{{name}}\";" \
-> default_ttl=1h \
-> max_ttl=24h
+      db_name=postgresql \
+      creation_statements="CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}'; \
+      GRANT SELECT ON ALL TABLES IN SCHEMA public TO \"{{name}}\";" \
+      default_ttl=1h \
+      max_ttl=24h
 
 #### Read dynamic secret in Vault as app, and check it exists in the DB:
 
